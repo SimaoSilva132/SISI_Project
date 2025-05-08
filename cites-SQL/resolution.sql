@@ -66,8 +66,28 @@ EXECUTE FUNCTION check_ongoing_trip();
 
 
 -- region Question 2
-CREATE OR REPLACE FUCTION fx-dock-occupancy(dockid integer) RETURNS ...
---TODO
+CREATE OR REPLACE FUNCTION fx_dock_occupancy(dockid INTEGER)
+RETURNS NUMERIC AS $$
+DECLARE
+  total_docas INTEGER;
+  ocupadas INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO total_docas
+  FROM Doca
+  WHERE estacao_id = dockid;
+
+  SELECT COUNT(*) INTO ocupadas
+  FROM Doca
+  WHERE estacao_id = dockid
+    AND estado = 'ocupado';
+
+  IF total_docas = 0 THEN
+    RETURN 0.0;
+  END IF;
+
+  RETURN ROUND(ocupadas::NUMERIC / total_docas, 2);
+END;
+$$ LANGUAGE plpgsql;
 -- endregion
  
 -- region Question 3
