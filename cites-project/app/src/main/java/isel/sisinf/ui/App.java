@@ -152,38 +152,119 @@ class UI
     private static final int TAB_SIZE = 24;
 
     private void createCostumer() {
-        // TODO
+   
+        Scanner s = new Scanner(System.in);
+        System.out.print("Nome: ");
+        String name = s.nextLine();
+        System.out.print("Email: ");
+        String email = s.nextLine();
+        System.out.print("NIF: ");
+        String nif = s.nextLine();
+        System.out.print("Tipo de Passe (ex: BASIC, PREMIUM): ");
+        String passType = s.nextLine();
+        System.out.print("Crédito inicial: ");
+        double credit = Double.parseDouble(s.nextLine());
+
+        try {
+            isel.sisinf.jpa.Dal.createCostumer(name, email, nif, passType, credit);
+            System.out.println("Cliente criado com sucesso.");
+        } catch (Exception ex) {
+            System.out.println("Erro: " + ex.getMessage());
+        }
+    }
+
         System.out.println("createCostumer()");
     }
   
-    private void listCostumer()
-    {
-        // TODO
+    private void listCostumer() { 
+
+        Scanner s = new Scanner(System.in);
+        System.out.print("Introduza NIF: ");
+        String nif = s.nextLine();
+
+        try {
+            var rider = isel.sisinf.jpa.Dal.getCostumerByNif(nif);
+            if (rider == null) {
+            System.out.println("Cliente não encontrado.");
+            } else {
+                System.out.printf("%-" + TAB_SIZE + "s%s\n", "Nome:", rider.getName());
+                System.out.printf("%-" + TAB_SIZE + "s%s\n", "Email:", rider.getEmail());
+                System.out.printf("%-" + TAB_SIZE + "s%s\n", "Tipo de Passe:", rider.getTypeOfCard());
+                System.out.printf("%-" + TAB_SIZE + "s%.2f€\n", "Crédito:", rider.getCredit());
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar cliente: " + e.getMessage());
+        }
         System.out.println("listCostumer()");
     }
 
-    private void listDocks()
-    {
-        // TODO
-        System.out.println("listDocks()");
 
+    private void listDocks() {
+        
+        Scanner s = new Scanner(System.in);
+        System.out.print("ID da Estação: ");
+        int stationId = Integer.parseInt(s.nextLine());
+
+        try {
+            double ocupacao = isel.sisinf.jpa.Dal.getDockOccupancy(stationId);
+            System.out.printf("Ocupação da estação: %.2f%%\n", ocupacao * 100);
+
+            var docas = isel.sisinf.jpa.Dal.getDocksByStation(stationId);
+            for (var d : docas) {
+                System.out.printf("Doca: %d | Estado: %s\n", d.getNumber(), d.getState());
+            }
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+        System.out.println("listDocks()");
     }
 
     private void startTrip() {
-        // TODO
+
+        Scanner s = new Scanner(System.in);
+        System.out.print("ID da doca: ");
+        int dockId = Integer.parseInt(s.nextLine());
+
+        System.out.print("ID do cliente: ");
+        int clientId = Integer.parseInt(s.nextLine());
+
+        try {
+            isel.sisinf.jpa.Dal.startTrip(dockId, clientId);
+            System.out.println("Viagem iniciada com sucesso.");
+        } catch (Exception e) {
+            System.out.println("Erro ao iniciar viagem: " + e.getMessage());
+        }
         System.out.println("startTrip()");
     }
+    
 
-    private void parkScooter()
-    {
-        // TODO
-        System.out.println("parkScooter()");
+    private void parkScooter() {
         
+        Scanner s = new Scanner(System.in);
+        System.out.print("ID da trotinete: ");
+        int scooterId = Integer.parseInt(s.nextLine());
+        System.out.print("Número da doca: ");
+        int dockNumber = Integer.parseInt(s.nextLine());
+
+        try {
+            isel.sisinf.jpa.Dal.parkScooter(scooterId, dockNumber);
+            System.out.println("Trotinete estacionada com sucesso.");
+        } catch (OptimisticLockException ole) {
+            System.out.println("Erro de concorrência: outra operação alterou a doca.");
+        } catch (Exception e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+        System.out.println("parkScooter()");
     }
 
     private void about()
     {
-        // TODO: Add your Group ID & member names
+        System.out.println("Grupo: G18T42D");
+        System.out.println("Autores:");
+        System.out.println("- Afonso Abranja");
+        System.out.println("- Cecília Marino");
+        System.out.println("- Simão Silva");
+        
         System.out.println("DAL version:"+ isel.sisinf.jpa.Dal.version());
         System.out.println("Core version:"+ isel.sisinf.model.Core.version());
         
